@@ -149,7 +149,7 @@ router.put('/users/update', function (req, res) {
 
 
     //  Delete user
-router.delete('/user', function (req, res) {
+router.delete('/user/delete', function (req, res) {
 
     let user_id = req.body.user_id;
     if (!user_id) {
@@ -203,5 +203,23 @@ db.query('SELECT * FROM users where id=?', decoded.id, function (error, results,
     return res.send({ error: false, data: results[0], message: 'Fetch Successfully.' });
 });
 });
+
+router.put('/profile/update', signupValidation, (req, res, next) => {
+    if(
+        !req.headers.authorization ||!req.headers.authorization.startsWith('Bearer') || !req.headers.authorization.split(' ')[1]
+    ){
+        return res.status(422).json({
+        message: "Please provide the token",
+    });
+}
+
+const theToken = req.headers.authorization.split(' ')[1];
+const decoded = jwt.verify(theToken, 'the-super-strong-secrect');
+db.query('SELECT * FROM users where id=?', decoded.id, function (error, results, fields) {
+    if (error) throw error;
+    return res.send({ error: false, data: results[0], message: 'Fetch Successfully.' });
+});
+});
+
 
 module.exports = router;
